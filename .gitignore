@@ -1,0 +1,38 @@
+# Secrets & Local Configurations
+.env
+*.env
+.env.local
+.env.*.local
+
+# Dependencies
+node_modules/
+frontend/node_modules/
+venv/
+.venv/
+env/
+ENV/
+
+# Python Cache & Build
+__pycache__/
+backend/__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.python-version
+
+# Frontend Build Output
+dist/
+frontend/dist/
+build/
+frontend/build/
+
+# Generated Presentations & Temporary Storage
+backend/storage/presentations/
+storage/presentations/
+*.pptx
+
+# IDE & OS Files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

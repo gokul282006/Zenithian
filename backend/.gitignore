@@ -1,0 +1,21 @@
+# Secrets
+.env
+*.env
+
+# Python Cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Environment
+venv/
+.venv/
+env/
+
+# Generated Storage & Outputs
+storage/presentations/
+*.pptx
+
+# IDE
+.vscode/
+.idea/
