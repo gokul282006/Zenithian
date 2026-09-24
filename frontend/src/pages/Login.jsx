@@ -8,12 +8,14 @@ export default function Login({ onLoginSuccess }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [notice, setNotice] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
+    setNotice('');
 
     if (!email || !password) {
       setError('Please enter both email and password.');
@@ -27,17 +29,24 @@ export default function Login({ onLoginSuccess }) {
         if (isRegister) {
           const { data, error: err } = await supabase.auth.signUp({ email, password });
           if (err) throw err;
-          onLoginSuccess(data.user);
+          if (data.session) {
+            onLoginSuccess(data.user);
+            navigate('/dashboard');
+          } else {
+            setNotice('Account created. Check your email to confirm your account, then sign in.');
+            setIsRegister(false);
+          }
         } else {
           const { data, error: err } = await supabase.auth.signInWithPassword({ email, password });
           if (err) throw err;
           onLoginSuccess(data.user);
+          navigate('/dashboard');
         }
       } else {
         // Fallback local session mode when Supabase env variables are not provided
         onLoginSuccess({ email, id: 'local_user_1' });
+        navigate('/dashboard');
       }
-      navigate('/dashboard');
     } catch (err) {
       setError(err.message || 'Authentication failed. Please check your credentials.');
     } finally {
@@ -72,6 +81,13 @@ export default function Login({ onLoginSuccess }) {
           <div className="mb-6 p-3.5 rounded-xl bg-rose-950/80 border border-rose-800/80 text-xs text-rose-200 flex items-center gap-2.5">
             <AlertCircle className="w-4 h-4 text-rose-400 shrink-0" />
             <span>{error}</span>
+          </div>
+        )}
+
+        {notice && (
+          <div className="mb-6 p-3.5 rounded-xl bg-emerald-950/80 border border-emerald-800/80 text-xs text-emerald-200 flex items-center gap-2.5">
+            <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+            <span>{notice}</span>
           </div>
         )}
 

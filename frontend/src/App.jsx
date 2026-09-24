@@ -82,7 +82,7 @@ function MainLayout({ user, onLogout, backendStatus, onRefreshStatus, currentOut
 export default function App() {
   const [user, setUser] = useState(() => {
     const saved = localStorage.getItem('zenithian_user');
-    return saved ? JSON.parse(saved) : { email: 'officer@domain.gov.in', id: 'usr_default' };
+    return saved ? JSON.parse(saved) : null;
   });
 
   const [backendStatus, setBackendStatus] = useState(null);
