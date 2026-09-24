@@ -33,6 +33,95 @@ class RetrievalService:
             pass
         return "Recent"
 
+    def _contains_location(self, text: str, location: str) -> bool:
+        normalized_text = re.sub(r"\s+", " ", (text or "")).strip().casefold()
+        normalized_location = re.sub(r"\s+", " ", (location or "")).strip().casefold()
+        if not normalized_text or not normalized_location:
+            return False
+        if " " in normalized_location:
+            return normalized_location in normalized_text
+        return re.search(rf"\b{re.escape(normalized_location)}\b", normalized_text) is not None
+
+    def _twitter_query(self, location: str, state: str, country: str, timeframe: str, topic: str) -> str:
+        time_days = {"48h": 2, "2d": 2, "7d": 7, "30d": 30, "6m": 180}
+        since = datetime.now(timezone.utc).date()
+        since = since.fromordinal(since.toordinal() - time_days.get(timeframe, 7))
+        parts = [f'"{location}"']
+        if state:
+            parts.append(f'"{state}"')
+        elif country:
+            parts.append(f'"{country}"')
+        if topic:
+            parts.append(topic.strip())
+        parts.extend([f"since:{since.isoformat()}", "-is:retweet"])
+        return " ".join(parts)
+
+    def _normalize_twitter_event(self, tweet: Dict[str, Any], location: str, state: str, timeframe: str) -> Dict[str, Any] | None:
+        text = self.clean_text(tweet.get("text") or tweet.get("fullText") or tweet.get("content", ""))
+        if not text or not self._contains_location(text, location):
+            return None
+
+        created_at = tweet.get("createdAt") or tweet.get("created_at") or ""
+        pub_date = self.format_pub_date(created_at)
+        tweet_id = tweet.get("id") or tweet.get("tweetId")
+        url = tweet.get("url") or tweet.get("twitterUrl")
+        if not url and tweet_id:
+            author = tweet.get("author", {}) or {}
+            username = author.get("userName") or author.get("username") or "i"
+            url = f"https://x.com/{username}/status/{tweet_id}"
+        if not url:
+            return None
+
+        author = tweet.get("author", {}) or {}
+        publisher = author.get("name") or author.get("userName") or "X / Twitter"
+        return {
+            "title": text[:180] + ("..." if len(text) > 180 else ""),
+            "publisher": f"X / Twitter - {publisher}",
+            "pub_date": pub_date,
+            "snippet": text,
+            "url": url,
+            "source_name": f"X / Twitter ({pub_date})",
+            "timeframe": timeframe,
+            "location_match": location,
+            "state_match": bool(state and self._contains_location(text, state))
+        }
+
+    async def fetch_twitter_events(
+        self,
+        location: str,
+        timeframe: str = "7d",
+        topic: str = "",
+        state: str = "",
+        country: str = ""
+    ) -> List[Dict[str, Any]]:
+        """Fetch latest location-matched posts from Twitterapi.io."""
+        if not settings.TWITTER_API_KEY or not location.strip():
+            return []
+
+        params = {
+            "query": self._twitter_query(location.strip(), state.strip(), country.strip(), timeframe, topic),
+            "queryType": "Latest"
+        }
+        headers = {**self.headers, "X-API-Key": settings.TWITTER_API_KEY}
+        try:
+            async with httpx.AsyncClient(timeout=12.0, headers=headers, follow_redirects=True) as client:
+                res = await client.get(settings.TWITTER_API_URL, params=params)
+                if res.status_code != 200:
+                    print(f"[Retrieval] Twitter API returned HTTP {res.status_code}")
+                    return []
+                payload = res.json()
+                tweets = payload.get("tweets") or payload.get("data") or []
+                events = []
+                for tweet in tweets:
+                    if isinstance(tweet, dict):
+                        event = self._normalize_twitter_event(tweet, location, state, timeframe)
+                        if event:
+                            events.append(event)
+                return events[:5]
+        except Exception as e:
+            print(f"[Retrieval] Twitter API fetch error for {location}: {e}")
+            return []
+
     async def fetch_wikimedia_images(
         self,
         location: str,
@@ -144,6 +233,15 @@ class RetrievalService:
 
         events = []
 
+        twitter_events = await self.fetch_twitter_events(
+            location=location,
+            timeframe=timeframe,
+            topic=topic,
+            state=state,
+            country=country
+        )
+        events.extend(twitter_events)
+
         try:
             async with httpx.AsyncClient(timeout=10.0, headers=self.headers, follow_redirects=True) as client:
                 res = await client.get(rss_url)
@@ -152,7 +250,7 @@ class RetrievalService:
                     channel = root.find("channel")
                     if channel is not None:
                         items = channel.findall("item")
-                        for item in items[:6]:
+                        for item in items[:8]:
                             title_raw = item.findtext("title", "")
                             link = item.findtext("link", "")
                             pub_date_raw = item.findtext("pubDate", "")
@@ -175,7 +273,8 @@ class RetrievalService:
                             if len(snippet) > 220:
                                 snippet = snippet[:217] + "..."
 
-                            if title and link:
+                            combined_text = f"{title} {snippet}"
+                            if title and link and self._contains_location(combined_text, location):
                                 events.append({
                                     "title": title,
                                     "publisher": publisher,
@@ -230,7 +329,15 @@ class RetrievalService:
             except Exception as e:
                 print(f"[Retrieval] Google Search news fallback error: {e}")
 
-        return events[:5]
+        unique_events = []
+        seen_event_keys = set()
+        for event in events:
+            event_key = event.get("url") or event.get("title", "").casefold()
+            if event_key and event_key not in seen_event_keys:
+                seen_event_keys.add(event_key)
+                unique_events.append(event)
+
+        return unique_events[:5]
 
     async def fetch_google_search(self, query: str) -> List[Dict[str, Any]]:
         """

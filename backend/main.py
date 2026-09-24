@@ -116,8 +116,9 @@ def health_check():
         "version": settings.VERSION,
         "ai_configured": ai_service.is_configured(),
         "supabase_configured": bool(settings.SUPABASE_URL and settings.SUPABASE_KEY),
-        "data_sources": ["Wikipedia API", "OpenStreetMap Nominatim", "Wikidata"],
-        "supported_platforms": ["x", "twitter", "linkedin", "facebook", "instagram", "powerpoint", "summary", "report", "email", "announcement"],
+        "data_sources": ["Wikipedia API", "OpenStreetMap Nominatim", "Wikidata", "Twitterapi.io", "Google News RSS"],
+        "twitter_api_configured": bool(settings.TWITTER_API_KEY),
+    "supported_platforms": ["x", "twitter", "linkedin", "facebook", "instagram", "powerpoint", "summary", "report", "email", "announcement"],
         "presentation_themes": [
             "zenithian_creative_flow",
             "zenithian_minimal_studio",
@@ -132,7 +133,8 @@ def status_details():
     return {
         "status": "healthy",
         "services": {
-            "retrieval_service": "Active (Wikipedia REST API & OpenStreetMap Nominatim)",
+            "retrieval_service": "Active (Twitterapi.io + Google News RSS + Wikipedia REST API + OpenStreetMap Nominatim)",
+            "twitter_api": "Configured" if settings.TWITTER_API_KEY else "Not configured; RSS fallback active",
             "rag_service": "Active (TF-IDF Vector Chunker & Ranker)",
             "social_service": "Active (X/Twitter, LinkedIn, Facebook, Instagram Synthesizer)",
             "presentation_service": "Active (5 Themes: Creative Flow, Minimal Studio, Future Grid, Impact Story, Executive)",

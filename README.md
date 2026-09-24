@@ -59,9 +59,12 @@ Edit `backend/.env` to configure your API keys:
 
 ```env
 GEMINI_API_KEY=your_google_gemini_api_key
+TWITTER_API_KEY=your_twitterapi_io_key
 SUPABASE_URL=https://your-project.supabase.co
 SUPABASE_KEY=your_supabase_anon_key
 ```
+
+When recent events are enabled, Zenithian queries Twitterapi.io for the latest posts matching the requested location and timeframe, filters out posts that do not mention that location, and falls back to Google News RSS when Twitterapi.io is unavailable.
 
 Run the FastAPI backend server:
 

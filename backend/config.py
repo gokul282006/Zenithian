@@ -23,6 +23,11 @@ class Settings:
 
     # News & External API Credentials
     NEWS_API_KEY: str = os.getenv("NEWS_API_KEY", "")
+    TWITTER_API_KEY: str = os.getenv("TWITTER_API_KEY", "")
+    TWITTER_API_URL: str = os.getenv(
+        "TWITTER_API_URL",
+        "https://api.twitterapi.io/twitter/tweet/advanced_search"
+    )
 
     # Supabase Database Credentials
     SUPABASE_URL: str = os.getenv("SUPABASE_URL", "")
