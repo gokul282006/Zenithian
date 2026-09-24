@@ -140,6 +140,10 @@ class RetrievalService:
         seen_urls = set()
         query = location.strip()
         encoded = quote_plus(query)
+        excluded_image_terms = re.compile(
+            r"\b(election|assembly|legislative|constituency|politician|mla|map)\b",
+            re.IGNORECASE
+        )
 
         # 1. Wikipedia Summary REST API for primary image
         summary_url = f"https://en.wikipedia.org/api/rest_v1/page/summary/{encoded}"
@@ -184,7 +188,13 @@ class RetrievalService:
                         img_url = thumbnail_info.get("source")
                         title = page_data.get("title", location)
                         terms = page_data.get("terms", {}).get("description", [""])[0]
-                        if img_url and img_url not in seen_urls:
+                        image_text = f"{title} {terms}"
+                        if (
+                            img_url
+                            and img_url not in seen_urls
+                            and self._contains_location(image_text, location)
+                            and not excluded_image_terms.search(image_text)
+                        ):
                             seen_urls.add(img_url)
                             images.append({
                                 "url": img_url,
