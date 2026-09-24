@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import Sidebar from './components/Sidebar';
 import Header from './components/Header';
-import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import GenerateContent from './pages/GenerateContent';
 import SocialPresentation from './pages/SocialPresentation';
@@ -82,7 +81,7 @@ function MainLayout({ user, onLogout, backendStatus, onRefreshStatus, currentOut
 export default function App() {
   const [user, setUser] = useState(() => {
     const saved = localStorage.getItem('zenithian_user');
-    return saved ? JSON.parse(saved) : null;
+    return saved ? JSON.parse(saved) : { email: 'workspace@zenithian.local', id: 'local_workspace' };
   });
 
   const [backendStatus, setBackendStatus] = useState(null);
@@ -104,38 +103,25 @@ export default function App() {
     checkBackendStatus();
   }, []);
 
-  const handleLogin = (userData) => {
-    setUser(userData);
-    localStorage.setItem('zenithian_user', JSON.stringify(userData));
-  };
-
   const handleLogout = () => {
-    setUser(null);
     localStorage.removeItem('zenithian_user');
+    setUser({ email: 'workspace@zenithian.local', id: 'local_workspace' });
   };
 
   return (
     <BrowserRouter>
       <Routes>
         <Route
-          path="/login"
-          element={<Login onLoginSuccess={handleLogin} />}
-        />
-        <Route
           path="/*"
           element={
-            user ? (
-              <MainLayout
-                user={user}
-                onLogout={handleLogout}
-                backendStatus={backendStatus}
-                onRefreshStatus={checkBackendStatus}
-                currentOutput={currentOutput}
-                setCurrentOutput={setCurrentOutput}
-              />
-            ) : (
-              <Navigate to="/login" replace />
-            )
+            <MainLayout
+              user={user}
+              onLogout={handleLogout}
+              backendStatus={backendStatus}
+              onRefreshStatus={checkBackendStatus}
+              currentOutput={currentOutput}
+              setCurrentOutput={setCurrentOutput}
+            />
           }
         />
       </Routes>
