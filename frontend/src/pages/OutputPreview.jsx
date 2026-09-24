@@ -14,11 +14,13 @@ import {
   AlertTriangle, 
   CheckCircle2, 
   Copy, 
-  Clock,
-  Sparkles,
-  ArrowLeft,
-  Presentation
+  Clock, 
+  Sparkles, 
+  ArrowLeft, 
+  Presentation,
+  Share2
 } from 'lucide-react';
+import SocialPostPreview, { XIcon } from '../components/SocialPostPreview';
 
 export default function OutputPreview({ outputData, onUpdateOutput }) {
   const navigate = useNavigate();
@@ -49,6 +51,23 @@ export default function OutputPreview({ outputData, onUpdateOutput }) {
   const [saveStatus, setSaveStatus] = useState('');
   const [exportingPPTX, setExportingPPTX] = useState(false);
   const [copied, setCopied] = useState(false);
+
+  const formatLower = (outputData.outputFormat || '').toLowerCase();
+  const isSocialFormat = 
+    formatLower.includes('twitter') ||
+    formatLower.includes('x ') ||
+    formatLower.includes('instagram') ||
+    formatLower.includes('linkedin') ||
+    formatLower.includes('facebook') ||
+    formatLower.includes('social');
+
+  const socialPlatform = formatLower.includes('instagram')
+    ? 'instagram'
+    : formatLower.includes('linkedin')
+    ? 'linkedin'
+    : formatLower.includes('facebook')
+    ? 'facebook'
+    : 'x';
 
   const handleSave = async () => {
     setSaveStatus('Saving...');
@@ -239,6 +258,23 @@ export default function OutputPreview({ outputData, onUpdateOutput }) {
               />
             </div>
           </div>
+        ) : isSocialFormat ? (
+          <div className="space-y-6">
+            <div className="border-b border-slate-100 pb-4">
+              <span className="inline-block px-2.5 py-1 rounded-md bg-slate-900 text-white text-xs font-bold uppercase tracking-wider mb-2">
+                {outputData.outputFormat}
+              </span>
+              <h2 className="text-2xl font-black text-slate-900 tracking-tight">{editedTitle}</h2>
+            </div>
+
+            <SocialPostPreview
+              platform={socialPlatform}
+              location={outputData.location}
+              content={editedContent}
+              hashtags={outputData.hashtags || []}
+              verificationStatus="Source Supported"
+            />
+          </div>
         ) : (
           <div className="space-y-4">
             <div className="border-b border-slate-100 pb-4">
@@ -254,6 +290,33 @@ export default function OutputPreview({ outputData, onUpdateOutput }) {
           </div>
         )}
       </div>
+
+      {/* Social Media Transformation Quick Card */}
+      {!isSocialFormat && (
+        <div className="p-5 rounded-3xl bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-lg border border-slate-800">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-2xl bg-blue-600/30 border border-blue-500/40 flex items-center justify-center text-sky-400">
+              <Sparkles className="w-5 h-5" />
+            </div>
+            <div>
+              <h4 className="text-sm font-bold text-white flex items-center gap-2">
+                <span>Transform this into Social Media Content</span>
+                <span className="px-2 py-0.5 rounded-full bg-blue-500/20 text-sky-300 text-[10px] font-semibold">1-Click</span>
+              </h4>
+              <p className="text-xs text-slate-300">
+                Generate 𝕏 (Twitter) threads, Instagram carousels, and LinkedIn posts for <strong>{outputData.location}</strong>.
+              </p>
+            </div>
+          </div>
+          <button
+            onClick={() => navigate('/social-presentation')}
+            className="px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold flex items-center gap-2 shadow-md transition-all shrink-0 hover-lift"
+          >
+            <Share2 className="w-3.5 h-3.5" />
+            <span>Open Social Studio</span>
+          </button>
+        </div>
+      )}
 
       {/* Data Chart Visual Section */}
       {outputData.chart_data && (

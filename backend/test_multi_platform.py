@@ -46,6 +46,18 @@ async def test_multi_platform():
     )
     print(f"Instagram Post Title: {insta_res.get('title')}")
     assert insta_res.get("platform") == "instagram", "Instagram platform mismatch"
+    assert "carousel_slides" in insta_res, "Instagram carousel_slides missing"
+
+    # 4b. X (Twitter) Generation
+    twitter_res = await social_service.generate_twitter(
+        location="Musiri", categories=["history", "geography"], audience="Public",
+        language="English", tone="Informative", objective="Information Sharing",
+        context=context, sources=sources, unavailable_categories=[]
+    )
+    print(f"X Post Title: {twitter_res.get('title')}")
+    assert twitter_res.get("platform") == "x", "X platform mismatch"
+    assert "single_tweet" in twitter_res, "X single_tweet missing"
+    assert len(twitter_res.get("thread", [])) >= 2, "X thread count should be at least 2"
 
     # 5. PowerPoint Presentation 10-Slide Generation
     pres_res = presentation_service.generate_presentation_file(

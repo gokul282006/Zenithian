@@ -72,6 +72,46 @@ export const api = {
     }
   },
 
+  async generateX(payload) {
+    try {
+      const res = await client.post('/social/x/generate', payload);
+      return { success: true, data: res.data };
+    } catch (err) {
+      return {
+        success: false,
+        error: err.response?.data?.detail || 'X (Twitter) post generation failed.'
+      };
+    }
+  },
+
+  async generateTwitter(payload) {
+    return this.generateX(payload);
+  },
+
+  async generateInstagram(payload) {
+    try {
+      const res = await client.post('/social/instagram/generate', payload);
+      return { success: true, data: res.data };
+    } catch (err) {
+      return {
+        success: false,
+        error: err.response?.data?.detail || 'Instagram caption generation failed.'
+      };
+    }
+  },
+
+  async generateLinkedIn(payload) {
+    try {
+      const res = await client.post('/social/linkedin/generate', payload);
+      return { success: true, data: res.data };
+    } catch (err) {
+      return {
+        success: false,
+        error: err.response?.data?.detail || 'LinkedIn post generation failed.'
+      };
+    }
+  },
+
   async fetchStoryboard(payload) {
     try {
       const res = await client.post('/presentations/storyboard', payload);

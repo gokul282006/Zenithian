@@ -71,7 +71,7 @@ class MultiGenerateRequest(BaseModel):
     tone: str = "Informative"
     detail_level: str = "Medium"
     objective: str = "Information Sharing"
-    platforms: List[str] = Field(default=["linkedin", "facebook", "instagram", "powerpoint"])
+    platforms: List[str] = Field(default=["x", "linkedin", "facebook", "instagram", "powerpoint"])
     theme: Optional[str] = "zenithian_creative_flow"
     aspect_ratio: Optional[str] = "16:9"
     include_sources: Optional[bool] = True
@@ -117,7 +117,7 @@ def health_check():
         "ai_configured": ai_service.is_configured(),
         "supabase_configured": bool(settings.SUPABASE_URL and settings.SUPABASE_KEY),
         "data_sources": ["Wikipedia API", "OpenStreetMap Nominatim", "Wikidata"],
-        "supported_platforms": ["linkedin", "facebook", "instagram", "powerpoint", "summary", "report", "email", "announcement"],
+        "supported_platforms": ["x", "twitter", "linkedin", "facebook", "instagram", "powerpoint", "summary", "report", "email", "announcement"],
         "presentation_themes": [
             "zenithian_creative_flow",
             "zenithian_minimal_studio",
@@ -134,7 +134,7 @@ def status_details():
         "services": {
             "retrieval_service": "Active (Wikipedia REST API & OpenStreetMap Nominatim)",
             "rag_service": "Active (TF-IDF Vector Chunker & Ranker)",
-            "social_service": "Active (LinkedIn, Facebook, Instagram Synthesizer)",
+            "social_service": "Active (X/Twitter, LinkedIn, Facebook, Instagram Synthesizer)",
             "presentation_service": "Active (5 Themes: Creative Flow, Minimal Studio, Future Grid, Impact Story, Executive)",
             "database": "Supabase PostgreSQL" if settings.SUPABASE_URL else "Local Memory Storage"
         }
@@ -288,6 +288,15 @@ async def multi_generate_content(req: MultiGenerateRequest):
             )
             platform_outputs["instagram"] = res
 
+        elif p_lower in ["x", "twitter", "x_twitter"]:
+            res = await social_service.generate_twitter(
+                location=req.location, categories=req.categories, audience=req.audience,
+                language=req.language, tone=req.tone, objective=req.objective,
+                context=context_str, sources=sources, unavailable_categories=unavailable_cats
+            )
+            platform_outputs["x"] = res
+            platform_outputs["twitter"] = res
+
         elif p_lower == "powerpoint" or p_lower == "presentation":
             pres = presentation_service.generate_presentation_file(
                 title=f"Location Presentation: {req.location}",
@@ -341,6 +350,13 @@ async def generate_instagram(req: MultiGenerateRequest):
     req.platforms = ["instagram"]
     res = await multi_generate_content(req)
     return res.get("outputs", {}).get("instagram", {})
+
+@app.post("/api/social/x/generate")
+@app.post("/api/social/twitter/generate")
+async def generate_x(req: MultiGenerateRequest):
+    req.platforms = ["x"]
+    res = await multi_generate_content(req)
+    return res.get("outputs", {}).get("x", {})
 
 @app.post("/api/presentations/generate")
 async def generate_presentation(req: MultiGenerateRequest):

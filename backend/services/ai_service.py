@@ -130,18 +130,65 @@ class AIService:
         """
         lines = []
 
-        if output_format == "Summary":
+        fmt_lower = output_format.lower()
+
+        if output_format == "Summary" or fmt_lower == "summary":
             lines.append(f"# {location}: Executive Briefing")
             lines.append(f"**Audience:** {audience} | **Objective:** {objective}\n")
             lines.append("### Key Highlights")
             lines.append(retrieved_context if retrieved_context else f"Core background details for {location}.")
 
-        elif output_format == "Email":
+        elif output_format == "Email" or fmt_lower == "email":
             lines.append(f"Subject: Briefing – {location}\n")
             lines.append(f"Hello {audience},\n")
             lines.append(f"Here is a summary regarding **{location}**:\n")
             lines.append(retrieved_context)
             lines.append("\nBest regards,\nExecutive Communications")
+
+        elif "twitter" in fmt_lower or "x (" in fmt_lower or fmt_lower in ["x", "twitter"]:
+            clean_ctx = retrieved_context.replace("\n", " ").strip() if retrieved_context else f"Core verified facts for {location}."
+            sentence_splits = [s.strip() for s in clean_ctx.split(". ") if len(s.strip()) > 15]
+            hook = sentence_splits[0] if len(sentence_splits) > 0 else f"Essential briefing on {location}"
+            if len(hook) > 180:
+                hook = hook[:175] + "..."
+            insight = sentence_splits[1] if len(sentence_splits) > 1 else f"Geographic and community developments in {location}."
+            if len(insight) > 200:
+                insight = insight[:195] + "..."
+
+            lines.append(f"# X (Twitter) Intel Thread: {location}\n")
+            lines.append(f"1/3 📍 Spotlight on #{location.replace(' ', '')}\n{hook}.\n")
+            lines.append(f"2/3 💡 Verified Insights:\n{insight}.\n")
+            lines.append(f"3/3 📊 Verified through open records & public databases.\nTarget Audience: {audience}\n\n#{location.replace(' ', '')} #LocationIntel #PublicBriefing #VerifiedFacts")
+
+        elif "instagram" in fmt_lower:
+            lines.append(f"# Instagram Caption & Carousel Outline: {location}\n")
+            lines.append("📸 **INSTAGRAM CAPTION:**")
+            lines.append(f"📍 {location} | Key Highlights ✨\n")
+            lines.append(retrieved_context[:450] if retrieved_context else f"Baseline facts for {location}.")
+            lines.append("\n👉 Swipe left to explore grounded community insights! 👈\n")
+            lines.append(f"#{location.replace(' ', '')} #ExploreLocation #CommunityBriefing #LocationHighlights #IncredibleIndia #VerifiedData\n")
+            lines.append("📱 **CAROUSEL SLIDE BREAKDOWN:**")
+            lines.append(f"• **Slide 1 (Cover)**: 📍 Discover {location} – Regional Overview & Charm")
+            lines.append(f"• **Slide 2 (Highlights)**: 💡 Grounded Facts, Heritage & Infrastructure Insights")
+            lines.append(f"• **Slide 3 (Data Integrity)**: 🔍 Verified Open Data Audit Trail & Public Records")
+
+        elif "linkedin" in fmt_lower:
+            lines.append(f"# LinkedIn Professional Update: {location}\n")
+            lines.append(f"📍 Strategic Update: {location}\n")
+            lines.append(f"Key observations and highlights for **{location}**:\n")
+            lines.append("💡 Highlights & Observations:")
+            lines.append(retrieved_context if retrieved_context else f"Baseline geographical and development details for {location}.")
+            lines.append(f"\n🎯 Target Audience: {audience} | Objective: {objective}\n")
+            lines.append(f"#{location.replace(' ', '')} #LocationInsights #PublicBriefing #StrategicUpdates #OpenData")
+
+        elif "social" in fmt_lower:
+            lines.append(f"# Social Media Multi-Platform Pack: {location}\n")
+            lines.append("### 1. 𝕏 (Twitter) Post / Thread")
+            lines.append(f"📍 Spotlight on #{location.replace(' ', '')}: {retrieved_context[:220]}...\n#{location.replace(' ', '')} #LocationIntel\n")
+            lines.append("### 2. 📷 Instagram Caption & Carousel")
+            lines.append(f"📍 Discover {location} ✨\n{retrieved_context[:350]}...\n👉 Swipe left for verified data! 👈\n#{location.replace(' ', '')} #Explore\n")
+            lines.append("### 3. 💼 LinkedIn Professional Post")
+            lines.append(f"📍 Strategic Overview: {location}\n{retrieved_context[:400]}...\n#{location.replace(' ', '')} #LocationInsights\n")
 
         elif output_format == "Public Announcement":
             lines.append(f"# PUBLIC ANNOUNCEMENT: {location.upper()}")

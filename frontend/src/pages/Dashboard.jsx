@@ -11,8 +11,14 @@ import {
   ArrowRight, 
   Database,
   Layers,
-  Cpu
+  Cpu,
+  Mail,
+  Presentation,
+  Share2,
+  Instagram,
+  Linkedin
 } from 'lucide-react';
+import { XIcon } from '../components/SocialPostPreview';
 
 export default function Dashboard({ user, backendStatus }) {
   const navigate = useNavigate();
@@ -136,26 +142,106 @@ export default function Dashboard({ user, backendStatus }) {
               Enter a location name (e.g. <strong>Musiri</strong>, <strong>Kanchipuram</strong>, <strong>Austin</strong>) to retrieve historical, geographic, educational, and economic facts.
             </p>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {/* Card 1: Social Studio */}
               <button
-                onClick={() => navigate('/generate')}
-                className="p-4 rounded-xl border border-blue-200 bg-blue-50/50 hover:bg-blue-50 text-left transition-all group"
+                type="button"
+                onClick={() => navigate('/social-presentation')}
+                className="p-5 rounded-2xl border border-slate-200 bg-gradient-to-br from-slate-900 to-slate-800 text-white hover:border-slate-700 text-left transition-all hover-lift group shadow-sm"
               >
-                <div className="flex items-center justify-between text-blue-700 font-bold text-sm mb-1">
-                  <span>Generate Report / Summary</span>
-                  <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                <div className="flex items-center justify-between font-bold text-sm mb-2">
+                  <div className="flex items-center gap-2">
+                    <div className="w-7 h-7 rounded-lg bg-white text-black flex items-center justify-center">
+                      <XIcon className="w-4 h-4" />
+                    </div>
+                    <Instagram className="w-4 h-4 text-pink-400" />
+                    <Linkedin className="w-4 h-4 text-sky-400" />
+                    <span>𝕏 & Instagram Social Studio</span>
+                  </div>
+                  <ArrowRight className="w-4 h-4 text-sky-400 group-hover:translate-x-1 transition-transform" />
                 </div>
-                <p className="text-xs text-slate-600">Create structured reports, emails, or public announcements grounded in data.</p>
+                <p className="text-xs text-slate-300">
+                  Generate 280-char tweets, multi-tweet threads, Instagram carousels, and LinkedIn executive posts.
+                </p>
+                <div className="mt-3 flex items-center gap-1.5 text-[10px] font-bold text-sky-300">
+                  <span className="px-2 py-0.5 rounded-md bg-white/10">𝕏 Post</span>
+                  <span className="px-2 py-0.5 rounded-md bg-white/10">3-Slide Carousel</span>
+                  <span className="px-2 py-0.5 rounded-md bg-white/10">Hashtags</span>
+                </div>
               </button>
 
+              {/* Card 2: Executive Summary & Report */}
               <button
-                onClick={() => navigate('/social-presentation')}
-                className="p-4 rounded-xl border border-indigo-200 bg-indigo-50/50 hover:bg-indigo-50 text-left transition-all group"
+                type="button"
+                onClick={() => navigate('/generate')}
+                className="p-5 rounded-2xl border border-blue-200 bg-blue-50/60 hover:bg-blue-50 text-left transition-all hover-lift group shadow-xs"
               >
-                <div className="flex items-center justify-between text-indigo-700 font-bold text-sm mb-1">
-                  <span>Social Studio & PowerPoint</span>
-                  <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                <div className="flex items-center justify-between text-blue-900 font-bold text-sm mb-2">
+                  <div className="flex items-center gap-2">
+                    <div className="w-7 h-7 rounded-lg bg-blue-600 text-white flex items-center justify-center">
+                      <FileText className="w-4 h-4" />
+                    </div>
+                    <span>Executive Summary & Report</span>
+                  </div>
+                  <ArrowRight className="w-4 h-4 text-blue-600 group-hover:translate-x-1 transition-transform" />
                 </div>
-                <p className="text-xs text-slate-600">Generate LinkedIn, Facebook, Instagram posts & 5 PowerPoint visual themes.</p>
+                <p className="text-xs text-slate-600">
+                  Synthesize verified historical, economic, and geographic facts into bulleted summaries or formal reports.
+                </p>
+                <div className="mt-3 flex items-center gap-1.5 text-[10px] font-bold text-blue-700">
+                  <span className="px-2 py-0.5 rounded-md bg-blue-100">Summary</span>
+                  <span className="px-2 py-0.5 rounded-md bg-blue-100">Report</span>
+                  <span className="px-2 py-0.5 rounded-md bg-blue-100">Zero Hallucination</span>
+                </div>
+              </button>
+
+              {/* Card 3: PowerPoint Deck */}
+              <button
+                type="button"
+                onClick={() => navigate('/social-presentation')}
+                className="p-5 rounded-2xl border border-amber-200 bg-amber-50/60 hover:bg-amber-50 text-left transition-all hover-lift group shadow-xs"
+              >
+                <div className="flex items-center justify-between text-amber-900 font-bold text-sm mb-2">
+                  <div className="flex items-center gap-2">
+                    <div className="w-7 h-7 rounded-lg bg-amber-600 text-white flex items-center justify-center">
+                      <Presentation className="w-4 h-4" />
+                    </div>
+                    <span>PowerPoint Presentation Deck</span>
+                  </div>
+                  <ArrowRight className="w-4 h-4 text-amber-600 group-hover:translate-x-1 transition-transform" />
+                </div>
+                <p className="text-xs text-slate-600">
+                  Download native 16:9 widescreen presentations with 5 Canva-inspired themes and data charts.
+                </p>
+                <div className="mt-3 flex items-center gap-1.5 text-[10px] font-bold text-amber-800">
+                  <span className="px-2 py-0.5 rounded-md bg-amber-100">5 Themes</span>
+                  <span className="px-2 py-0.5 rounded-md bg-amber-100">.PPTX File</span>
+                  <span className="px-2 py-0.5 rounded-md bg-amber-100">Data Charts</span>
+                </div>
+              </button>
+
+              {/* Card 4: Stakeholder Email & Briefing */}
+              <button
+                type="button"
+                onClick={() => navigate('/generate')}
+                className="p-5 rounded-2xl border border-indigo-200 bg-indigo-50/60 hover:bg-indigo-50 text-left transition-all hover-lift group shadow-xs"
+              >
+                <div className="flex items-center justify-between text-indigo-900 font-bold text-sm mb-2">
+                  <div className="flex items-center gap-2">
+                    <div className="w-7 h-7 rounded-lg bg-indigo-600 text-white flex items-center justify-center">
+                      <Mail className="w-4 h-4" />
+                    </div>
+                    <span>Stakeholder Email Briefing</span>
+                  </div>
+                  <ArrowRight className="w-4 h-4 text-indigo-600 group-hover:translate-x-1 transition-transform" />
+                </div>
+                <p className="text-xs text-slate-600">
+                  Draft executive briefings and public announcements formatted specifically for leadership and teams.
+                </p>
+                <div className="mt-3 flex items-center gap-1.5 text-[10px] font-bold text-indigo-800">
+                  <span className="px-2 py-0.5 rounded-md bg-indigo-100">Email Format</span>
+                  <span className="px-2 py-0.5 rounded-md bg-indigo-100">Public Notice</span>
+                  <span className="px-2 py-0.5 rounded-md bg-indigo-100">Audience Tuned</span>
+                </div>
               </button>
             </div>
           </div>

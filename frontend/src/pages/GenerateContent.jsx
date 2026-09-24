@@ -13,8 +13,15 @@ import {
   FileCheck, 
   AlertCircle,
   Loader2,
-  Check
+  Check,
+  Share2,
+  Instagram,
+  Linkedin,
+  Mail,
+  Presentation,
+  FileText
 } from 'lucide-react';
+import { XIcon } from '../components/SocialPostPreview';
 
 export default function GenerateContent({ onGenerateSuccess }) {
   const navigate = useNavigate();
@@ -375,21 +382,88 @@ export default function GenerateContent({ onGenerateSuccess }) {
               </select>
             </div>
 
-            <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1.5 flex items-center gap-1">
-                <FileCheck className="w-3.5 h-3.5 text-blue-600" /> Output Format
+            <div className="sm:col-span-3 pt-2 border-t border-slate-100">
+              <label className="block text-xs font-bold text-slate-800 mb-2 flex items-center justify-between">
+                <span className="flex items-center gap-1.5">
+                  <FileCheck className="w-4 h-4 text-blue-600" />
+                  Select Output Format & Channel
+                </span>
+                <span className="text-[11px] font-semibold text-blue-600">
+                  {outputFormat.includes('X') || outputFormat.includes('Instagram') || outputFormat.includes('LinkedIn') || outputFormat.includes('Social')
+                    ? '📱 Social Media Post'
+                    : outputFormat === 'PowerPoint' ? '📊 Visual Slide Deck' : '📄 Document / Briefing'}
+                </span>
               </label>
+
+              {/* Quick Format Pills */}
+              <div className="flex flex-wrap gap-2 mb-3">
+                {[
+                  { id: 'Summary', label: 'Summary', icon: FileText, category: 'doc' },
+                  { id: 'Email', label: 'Email', icon: Mail, category: 'doc' },
+                  { id: 'PowerPoint', label: 'PowerPoint', icon: Presentation, category: 'deck' },
+                  { id: 'X (Twitter) Post & Thread', label: '𝕏 (Twitter) Post', icon: XIcon, category: 'social' },
+                  { id: 'Instagram Post & Carousel', label: 'Instagram', icon: Instagram, category: 'social' },
+                  { id: 'LinkedIn Professional Post', label: 'LinkedIn', icon: Linkedin, category: 'social' },
+                  { id: 'Report', label: 'Report', icon: FileCheck, category: 'doc' },
+                ].map((item) => {
+                  const Icon = item.icon;
+                  const isSelected = outputFormat === item.id;
+                  return (
+                    <button
+                      key={item.id}
+                      type="button"
+                      onClick={() => setOutputFormat(item.id)}
+                      className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all hover-lift ${
+                        isSelected
+                          ? item.category === 'social'
+                            ? 'bg-slate-900 text-white shadow-sm shadow-slate-900/20 ring-2 ring-blue-500'
+                            : 'bg-blue-600 text-white shadow-sm shadow-blue-600/30 ring-2 ring-blue-400'
+                          : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+                      }`}
+                    >
+                      <Icon className="w-3.5 h-3.5 shrink-0" />
+                      <span>{item.label}</span>
+                    </button>
+                  );
+                })}
+              </div>
+
+              {/* Detailed Dropdown */}
               <select
                 value={outputFormat}
                 onChange={(e) => setOutputFormat(e.target.value)}
-                className="w-full bg-blue-50 border border-blue-300 text-blue-900 rounded-xl px-3 py-2.5 text-sm font-bold focus:outline-none focus:border-blue-600 focus:bg-white"
+                className="w-full bg-blue-50/70 border border-blue-300 text-blue-950 rounded-xl px-3.5 py-3 text-sm font-bold focus:outline-none focus:border-blue-600 focus:bg-white shadow-2xs"
               >
-                <option value="Summary">Summary</option>
-                <option value="Report">Report</option>
-                <option value="Email">Email</option>
-                <option value="Public Announcement">Public Announcement</option>
-                <option value="PowerPoint">PowerPoint (.pptx)</option>
+                <optgroup label="📱 Social Media Posts & Threads">
+                  <option value="X (Twitter) Post & Thread">𝕏 X (Twitter) Post & Thread (280-char & 3-tweet sequence)</option>
+                  <option value="Instagram Post & Carousel">📷 Instagram Caption & 3-Slide Visual Carousel</option>
+                  <option value="LinkedIn Professional Post">💼 LinkedIn Professional Post & Executive Insights</option>
+                  <option value="Social Media Pack (X, Insta, LinkedIn)">✨ Multi-Platform Social Media Pack (All Channels)</option>
+                </optgroup>
+                <optgroup label="📄 Executive & Stakeholder Briefings">
+                  <option value="Summary">Executive Summary (Concise Bullet Highlights)</option>
+                  <option value="Report">Comprehensive Grounded Report</option>
+                  <option value="Email">Stakeholder Briefing Email</option>
+                  <option value="Public Announcement">Official Public Announcement</option>
+                </optgroup>
+                <optgroup label="📊 Visual Presentations">
+                  <option value="PowerPoint">PowerPoint (.pptx) Presentation Deck (9+ slides)</option>
+                </optgroup>
               </select>
+
+              {/* Format description notice */}
+              <p className="text-[11px] text-slate-500 mt-2 flex items-center gap-1.5">
+                <Sparkles className="w-3.5 h-3.5 text-blue-600 shrink-0" />
+                {outputFormat.includes('X') && 'Generates punchy, character-counted tweets and 3-part threads with hashtags ready for 𝕏.'}
+                {outputFormat.includes('Instagram') && 'Generates high-engagement captions, 3-slide visual carousel structures, and hashtag clouds.'}
+                {outputFormat.includes('LinkedIn') && 'Generates authoritative, executive-level thought leadership posts with bullet points.'}
+                {outputFormat.includes('Social Media Pack') && 'Generates all social formats together in one unified intelligence briefing.'}
+                {outputFormat === 'Summary' && 'Generates concise, bulleted key highlights grounded in verified records.'}
+                {outputFormat === 'Email' && 'Generates a ready-to-send email with subject line and clear paragraphs.'}
+                {outputFormat === 'Report' && 'Generates a structured multi-section intelligence report with citations.'}
+                {outputFormat === 'Public Announcement' && 'Generates a formal public announcement suitable for official channels.'}
+                {outputFormat === 'PowerPoint' && 'Prepares grounded presentation slides with data charts and source disclosures.'}
+              </p>
             </div>
           </div>
         </div>
