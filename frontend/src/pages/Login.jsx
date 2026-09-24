@@ -48,7 +48,12 @@ export default function Login({ onLoginSuccess }) {
         navigate('/dashboard');
       }
     } catch (err) {
-      setError(err.message || 'Authentication failed. Please check your credentials.');
+      const message = err.message || '';
+      if (message.toLowerCase().includes('failed to fetch')) {
+        setError('Unable to reach Supabase. In Vercel, configure VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY, then redeploy the frontend.');
+      } else {
+        setError(message || 'Authentication failed. Please check your credentials.');
+      }
     } finally {
       setLoading(false);
     }
