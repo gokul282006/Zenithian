@@ -491,6 +491,8 @@ class RetrievalService:
         for label, res in metrics_map:
             if isinstance(res, list) and res:
                 for item in res:
+                    if not self._contains_location(f"{item['title']} {item['snippet']}", location):
+                        continue
                     snippets.append(f"{label} Stats ({item['title']}): {item['snippet']}")
                     sources.append({
                         "source_name": f"Wikipedia - {item['title']}",
@@ -536,7 +538,7 @@ class RetrievalService:
                         t = item.get("title") or item.get("source_name", "Source")
                         snip = item.get("snippet", "")
                         url = item.get("url")
-                        if snip:
+                        if snip and self._contains_location(f"{t} {snip}", location):
                             snippets.append(f"{topic} ({t}): {snip}")
                             if url:
                                 sources.append({
@@ -626,6 +628,8 @@ class RetrievalService:
 
             if isinstance(google_res, list) and google_res:
                 for g_item in google_res:
+                    if not self._contains_location(f"{g_item['title']} {g_item['snippet']}", location):
+                        continue
                     cat_snippets.append(f"Google Search ({g_item['title']}): {g_item['snippet']}")
                     cat_sources.append({
                         "source_name": g_item['source_name'],
@@ -637,6 +641,8 @@ class RetrievalService:
 
             if isinstance(wiki_res, list) and wiki_res:
                 for item in wiki_res:
+                    if not self._contains_location(f"{item['title']} {item['snippet']}", location):
+                        continue
                     cat_snippets.append(f"Wikipedia ({item['title']}): {item['snippet']}")
                     cat_sources.append({
                         "source_name": f"Wikipedia - {item['title']}",
